@@ -1,19 +1,18 @@
 import os
-import asyncio
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 from playwright.async_api import async_playwright
+import asyncio
 
-# Obtener token desde variable de entorno
 TOKEN = os.getenv("TELEGRAM_TOKEN")
 if not TOKEN:
     raise ValueError("Falta el token de Telegram. Define TELEGRAM_TOKEN en Render.")
 
-# Comando /start
+# /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Bot iniciado correctamente ✅")
 
-# Comando /scrape (ejemplo con Playwright)
+# /scrape
 async def scrape(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Iniciando scraping con Playwright... ⏳")
     try:
@@ -27,12 +26,10 @@ async def scrape(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except Exception as e:
         await update.message.reply_text(f"Error al hacer scraping: {e}")
 
-# Función principal para correr el bot
-async def main():
-    app = ApplicationBuilder().token(TOKEN).build()
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("scrape", scrape))
-    await app.run_polling()
+# Crear la aplicación
+app = ApplicationBuilder().token(TOKEN).build()
+app.add_handler(CommandHandler("start", start))
+app.add_handler(CommandHandler("scrape", scrape))
 
-if __name__ == "__main__":
-    asyncio.run(main())
+# Ejecutar el bot (Render ya maneja el event loop)
+app.run_polling()
