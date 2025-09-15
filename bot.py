@@ -2,7 +2,6 @@ import os
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 from playwright.async_api import async_playwright
-import asyncio
 
 # Obtener el token de las variables de entorno de Render
 TOKEN = os.getenv("TELEGRAM_TOKEN")
@@ -27,26 +26,24 @@ async def scrape(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except Exception as e:
         await update.message.reply_text(f"Error al hacer scraping: {e}")
 
-# Función principal para ejecutar el bot
-async def main():
+if __name__ == "__main__":
     app = ApplicationBuilder().token(TOKEN).build()
-    
-    # --- Diagnóstico de conexión (NUEVO CÓDIGO) ---
-    try:
-        await app.bot.get_me()
-        print("✅ Conexión exitosa con la API de Telegram.")
-    except Exception as e:
-        print(f"❌ Error de conexión con Telegram: {e}")
-        return
-    # --- Fin del código de diagnóstico ---
-        
+
+    # --- Diagnóstico de conexión ---
+    import asyncio
+    async def check_connection():
+        try:
+            me = await app.bot.get_me()
+            print(f"✅ Conexión exitosa con la API de Telegram como {me.username}")
+        except Exception as e:
+            print(f"❌ Error de conexión con Telegram: {e}")
+
+    asyncio.run(check_connection())
+    # --- Fin diagnóstico ---
+
     # Añadir los manejadores de comandos
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("scrape", scrape))
-    
-    # Iniciar el bot y esperar actualizaciones
-    print("🤖 Bot ejecutándose...")
-    await app.run_polling()
 
-if __name__ == "__main__":
-    asyncio.run(main())
+    print("🤖 Bot ejecutándose...")
+    app.run_polling()
