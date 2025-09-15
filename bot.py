@@ -1,4 +1,5 @@
 import os
+import asyncio
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 from playwright.async_api import async_playwright
@@ -8,7 +9,7 @@ if not TOKEN:
     raise ValueError("Falta el token de Telegram. Define TELEGRAM_TOKEN en Render.")
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Bot iniciado correctamente ✅")
+    await update.message.reply_text("✅ Bot iniciado correctamente")
 
 async def scrape(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Iniciando scraping con Playwright... ⏳")
@@ -26,12 +27,11 @@ async def scrape(update: Update, context: ContextTypes.DEFAULT_TYPE):
 if __name__ == "__main__":
     app = ApplicationBuilder().token(TOKEN).build()
 
-    # Diagnóstico de conexión
+    # Diagnóstico para ver si conecta con Telegram
     async def check_bot():
         me = await app.bot.get_me()
         print(f"✅ Conexión exitosa con la API de Telegram como {me.username}")
 
-    import asyncio
     asyncio.get_event_loop().run_until_complete(check_bot())
 
     app.add_handler(CommandHandler("start", start))
