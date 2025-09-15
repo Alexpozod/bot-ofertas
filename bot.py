@@ -4,16 +4,13 @@ from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 from playwright.async_api import async_playwright
 
-# Obtener el token de las variables de entorno de Render
 TOKEN = os.getenv("TELEGRAM_TOKEN")
 if not TOKEN:
     raise ValueError("Falta el token de Telegram. Define TELEGRAM_TOKEN en Render.")
 
-# /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Bot iniciado correctamente ✅")
 
-# /scrape
 async def scrape(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Iniciando scraping con Playwright... ⏳")
     try:
@@ -38,7 +35,6 @@ async def main():
         print(f"❌ Error de conexión con Telegram: {e}")
         return
 
-    # Añadir los manejadores de comandos
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("scrape", scrape))
 
@@ -46,6 +42,5 @@ async def main():
     await app.run_polling()
 
 if __name__ == "__main__":
-    # ⚡ Forzar creación de event loop compatible con Python 3.13
     asyncio.set_event_loop_policy(asyncio.DefaultEventLoopPolicy())
     asyncio.run(main())
