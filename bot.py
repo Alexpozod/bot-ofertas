@@ -1,4 +1,5 @@
 import os
+import asyncio
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 from playwright.async_api import async_playwright
@@ -27,10 +28,15 @@ async def scrape(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(f"Error al hacer scraping: {e}")
 
 if __name__ == "__main__":
+    # ⚡ Solución para Python 3.13: crear un loop manual
+    try:
+        asyncio.get_event_loop()
+    except RuntimeError:
+        asyncio.set_event_loop(asyncio.new_event_loop())
+
     app = ApplicationBuilder().token(TOKEN).build()
 
-    # --- Diagnóstico de conexión ---
-    import asyncio
+    # Diagnóstico de conexión
     async def check_connection():
         try:
             me = await app.bot.get_me()
@@ -39,7 +45,6 @@ if __name__ == "__main__":
             print(f"❌ Error de conexión con Telegram: {e}")
 
     asyncio.run(check_connection())
-    # --- Fin diagnóstico ---
 
     # Añadir los manejadores de comandos
     app.add_handler(CommandHandler("start", start))
