@@ -27,28 +27,25 @@ async def scrape(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except Exception as e:
         await update.message.reply_text(f"Error al hacer scraping: {e}")
 
-if __name__ == "__main__":
-    # ⚡ Solución para Python 3.13: crear un loop manual
-    try:
-        asyncio.get_event_loop()
-    except RuntimeError:
-        asyncio.set_event_loop(asyncio.new_event_loop())
-
+async def main():
     app = ApplicationBuilder().token(TOKEN).build()
 
     # Diagnóstico de conexión
-    async def check_connection():
-        try:
-            me = await app.bot.get_me()
-            print(f"✅ Conexión exitosa con la API de Telegram como {me.username}")
-        except Exception as e:
-            print(f"❌ Error de conexión con Telegram: {e}")
-
-    asyncio.run(check_connection())
+    try:
+        me = await app.bot.get_me()
+        print(f"✅ Conexión exitosa con la API de Telegram como {me.username}")
+    except Exception as e:
+        print(f"❌ Error de conexión con Telegram: {e}")
+        return
 
     # Añadir los manejadores de comandos
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("scrape", scrape))
 
     print("🤖 Bot ejecutándose...")
-    app.run_polling()
+    await app.run_polling()
+
+if __name__ == "__main__":
+    # ⚡ Forzar creación de event loop compatible con Python 3.13
+    asyncio.set_event_loop_policy(asyncio.DefaultEventLoopPolicy())
+    asyncio.run(main())
